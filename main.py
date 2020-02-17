@@ -5,18 +5,20 @@ from time import time
 
 client = discord.Client()
 
-nuke_last = time()
-NUKELIMIT = 240
+nuke_last = -1
+NUKELIMIT = 60
 
 @client.event
 async def on_ready():
     print("I'm in")
     print(client.user)
+    nuke_last = time()
 
 async def printMessage(message):
   print(" > {} sent: {}".format(message.author.name, message.content))
 
 async def commandz(message):#if a command is recognized
+  global nuke_last
   channel = message.channel
   content = message.content
   author = message.author
@@ -31,17 +33,24 @@ async def commandz(message):#if a command is recognized
   command = command.split()
   if command[0] == "ping":
     await channel.send("Pong!")
+  print(nuke_last)
   try:
     if command[0] == "nuke":
       target = message.mentions[1]
       print("Nuke activated on {}".format(target))
       command[2] = int(command[2])
       print(command)
+      print(command[2])
       if command[2] < 1 or command[2] > 5:
         raise Exception("Fuck")
-      prnit("Valid num")
+      
+      print(nuke_last)
+      print(time())
+      elapsed = time()-nuke_last
+      print("Elapsed: {}".format(elapsed))
+      print("Bruh")
       if time()-nuke_last < NUKELIMIT:
-        await channel.send("Nuke on cooldown...")
+        await channel.send("Nuke on cooldown... {} remaining".format(round(NUKELIMIT-elapsed,1)))
         return
       nuke_last = time()
       for i in range(int(command[2])):
